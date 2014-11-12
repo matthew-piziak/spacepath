@@ -12,14 +12,13 @@ class NewtNode(object):
         self.v_y = v_y
         self.angle = angle
 
-    # sort arbitrarily
+    # sort arbitarily
     def __lt__(self, other):
         return True
 
 START = NewtNode(0, 0, 0, 0, 0)
-GOAL = NewtNode(70, 70, 0, 0, 0)
-ACCELERATION = 0.4
-TURNING_ANGLE = math.pi / 8
+GOAL = NewtNode(random.randint(50, 150), random.randint(50, 150), 0, 0, 0)
+ACCELERATION = 1
 
 def adj_position(node):
     """determines position for the next time step"""
@@ -27,18 +26,19 @@ def adj_position(node):
 
 def adj_velocities(node):
     """choices are burn or cruise"""
-    delta_v_x = math.cos(node.angle) * ACCELERATION
-    delta_v_y = math.sin(node.angle) * ACCELERATION
+    angle = node.angle * (1 / 8) * 2 * math.pi
+    delta_v_x = int(math.cos(angle) * ACCELERATION)
+    delta_v_y = int(math.sin(angle) * ACCELERATION)
     cruise = (node.v_x, node.v_y)
     burn = (node.v_x + delta_v_x, node.v_y + delta_v_y)
-    return [cruise, burn]
+    return [burn, cruise]
 
 def adj_angles(node):
     """determines adjacent angles based on turning choice"""
-    adj_angles_unnormalized = [node.angle,
-                               node.angle - TURNING_ANGLE,
-                               node.angle + TURNING_ANGLE]
-    adj_angles_normalized = [a % (2 * math.pi) for a in adj_angles_unnormalized]
+    adj_angles_unnormalized = [node.angle - 1,
+                               node.angle + 1,
+                               node.angle]
+    adj_angles_normalized = [a % 8 for a in adj_angles_unnormalized]
     return adj_angles_normalized
 
 def adjacent(node):
@@ -51,29 +51,36 @@ def adjacent(node):
                 adj_nodes.append(adj_node)
     return adj_nodes
 
+def circle_contains(x, y, c_x, c_y, c_r):
+    dx = abs(x - c_x)
+    dy = abs(y - c_y)
+    if dx > c_r:
+        return False
+    if dy > c_r:
+        return False
+    if dx + dy <= c_r:
+        return True
+    return dx**2 + dy**2 <= c_r**2
+
+
 def heuristic(node, goal, obstacles):
     """newtonian physics heuristic for A*"""
     for obstacle in obstacles:
-        dx = abs(node.x - obstacle.x)
-        dy = abs(node.y - obstacle.y)
-        if dx + dy <= obstacle.radius:
-            return 100000
-        if dx > obstacle.radius:
-            continue
-        if dy > obstacle.radius:
-            continue
-        if dx**2 + dy**2 <= obstacle.radius**2:
-            return 100000
-    pos_distance = math.sqrt((goal.x-node.x)**2 + (goal.y-node.y)**2)
-    opt_v_x = goal.x-node.x * ACCELERATION * 0.7
-    opt_v_y = goal.y-node.y * ACCELERATION * 0.7
-    vel_distance =  math.sqrt((opt_v_x-node.v_x)**2 + (opt_v_y-node.v_y)**2)
-    return 1.01 * (pos_distance + vel_distance)
-
+        if circle_contains(node.x, node.y, obstacle.x, obstacle.y, obstacle.radius):
+            return 1000000
+    distance = 0
+    x = node.x
+    y = node.y
+    while True:
+        x += node.v_x
+        y += node.v_y
+        r = (distance**2) * ACCELERATION * 0.5
+        if circle_contains(goal.x, goal.y, x, y, r):
+            return distance
+        distance += 1
+        
 def success(node, goal):
     """success function for A*"""
-    dx = abs(node.x - goal.x)
-    dy = abs(node.y - goal.y)
-    return dx + dy < 10
+    return circle_contains(node.x, node.y, goal.x, goal.y, 20)
 
 

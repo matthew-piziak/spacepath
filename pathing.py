@@ -1,38 +1,38 @@
 """generalized pathing functions"""
 
 import heapq
+import time
 
 def a_star(start, goal, adjacent, heuristic, success):
     """A* pathing algorithm"""
-    open_set = set()
     open_heap = []
-    closed_set = set()
+    seen = set()
     came_from = {}
-    open_set.add(start)
-    open_heap.append((0, start))
     g_score = {}
     f_score = {}
     g_score[start] = 0
     f_score[start] = g_score[start] + heuristic(start, goal)
-    while open_set:
+    open_heap.append((f_score[start], start))
+    seen.add(_node_to_tuple(start))
+    while True:
         node = heapq.heappop(open_heap)[1]
+        if len(open_heap) > 400000:
+            print((node.x, node.y, node.v_x, node.v_y, node.angle))
+            print(g_score[node])
+            print(heuristic(node, goal))
+            return [node]
         if success(node, goal):
-            print(len(open_set))
+            print(len(open_heap))
             return _reconstruct_path(came_from, node)
-        open_set.remove(node)
-        closed_set.add(node)
         for adj in adjacent(node):
-            if adj in closed_set:
+            if _node_to_tuple(adj) in seen:
                 continue
-            adj_distance = 1 # adjacency is based on a constant time step
-            tentative_g_score = g_score[node] + adj_distance
-            if adj not in open_set or tentative_g_score < g_score[adj]:
-                came_from[adj] = node
-                g_score[adj] = tentative_g_score
-                f_score[adj] = g_score[adj] + heuristic(adj, goal)
-                open_set.add(adj)
-                heapq.heappush(open_heap, (f_score[adj], adj))
-    return []
+            seen.add(_node_to_tuple(adj))
+            came_from[adj] = node
+            # adjacency is based on a constant time step
+            g_score[adj] = g_score[node] + 1 
+            f_score[adj] = g_score[adj] + heuristic(adj, goal)
+            heapq.heappush(open_heap, (f_score[adj], adj))
 
 def _reconstruct_path(came_from, node):
     """trace back the path built by A*"""
@@ -41,3 +41,6 @@ def _reconstruct_path(came_from, node):
         return path + [node]
     else:
         return [node]
+
+def _node_to_tuple(node):
+    return (node.x, node.y, node.v_x, node.v_y, node.angle)
