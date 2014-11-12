@@ -1,7 +1,7 @@
 """Newtonian physics specificiations"""
 
-import pathing
 import math
+import random
 
 class NewtNode(object):
     """wrapper for node tuples"""
@@ -15,10 +15,10 @@ class NewtNode(object):
     # sort arbitrarily
     def __lt__(self, other):
         return True
-    
-NEWT_START = NewtNode(0, 0, 0, 0, 0)
-NEWT_GOAL = NewtNode(70, 70, 0, 0, 0)
-ACCELERATION = 0.2
+
+START = NewtNode(0, 0, 0, 0, 0)
+GOAL = NewtNode(70, 70, 0, 0, 0)
+ACCELERATION = 0.3
 TURNING_ANGLE = math.pi / 8
 
 def adj_position(node):
@@ -55,7 +55,7 @@ def heuristic(node, goal, obstacles):
     """newtonian physics heuristic for A*"""
     for obstacle in obstacles:
         if math.sqrt((node.x-obstacle.x)**2 + (node.y-obstacle.y)**2) < obstacle.radius:
-            return 100
+            return 1000
     pos_distance = math.sqrt((goal.x-node.x)**2 + (goal.y-node.y)**2)
     opt_v_x = (goal.x-node.x) * ACCELERATION * 0.5
     opt_v_y = (goal.y-node.y) * ACCELERATION * 0.5
@@ -65,5 +65,5 @@ def heuristic(node, goal, obstacles):
 def success(node, goal):
     """success function for A*"""
     pos_distance = math.sqrt((goal.x-node.x)**2 + (goal.y-node.y)**2)
-    return pos_distance < 20
+    return pos_distance < 2
 
