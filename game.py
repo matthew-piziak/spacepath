@@ -74,6 +74,6 @@ if __name__ == "__main__":
             obstacle.draw(WINDOW)
         draw_node(WINDOW, node)
         draw_goal(WINDOW)
-        time.sleep(0.02)
+        time.sleep(0.03)
         pygame.display.flip()
         # pygame.image.save(WINDOW, str(screen).zfill(4) + "screen.png")

@@ -18,7 +18,7 @@ class NewtNode(object):
 
 START = NewtNode(0, 0, 0, 0, 0)
 GOAL = NewtNode(70, 70, 0, 0, 0)
-ACCELERATION = 0.3
+ACCELERATION = 0.4
 TURNING_ANGLE = math.pi / 8
 
 def adj_position(node):
@@ -57,21 +57,23 @@ def heuristic(node, goal, obstacles):
         dx = abs(node.x - obstacle.x)
         dy = abs(node.y - obstacle.y)
         if dx + dy <= obstacle.radius:
-            return 10000
+            return 100000
         if dx > obstacle.radius:
             continue
         if dy > obstacle.radius:
             continue
         if dx**2 + dy**2 <= obstacle.radius**2:
-            return 10000
+            return 100000
     pos_distance = math.sqrt((goal.x-node.x)**2 + (goal.y-node.y)**2)
-    opt_v_x = (goal.x-node.x) * ACCELERATION * 0.7
-    opt_v_y = (goal.y-node.y) * ACCELERATION * 0.7
+    opt_v_x = goal.x-node.x * ACCELERATION * 0.7
+    opt_v_y = goal.y-node.y * ACCELERATION * 0.7
     vel_distance =  math.sqrt((opt_v_x-node.v_x)**2 + (opt_v_y-node.v_y)**2)
     return 1.01 * (pos_distance + vel_distance)
 
 def success(node, goal):
     """success function for A*"""
-    pos_distance = math.sqrt((goal.x-node.x)**2 + (goal.y-node.y)**2)
-    return pos_distance < 2
+    dx = abs(node.x - goal.x)
+    dy = abs(node.y - goal.y)
+    return dx + dy < 10
+
 
