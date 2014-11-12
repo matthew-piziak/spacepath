@@ -67,8 +67,8 @@ if __name__ == "__main__":
                           newt.adjacent,
                           lambda n, g: newt.heuristic(n, g, obstacles),
                           newt.success)
-    WINDOW = pygame.display.set_mode((90 * DRAW_SCALE, 90 * DRAW_SCALE))
     for screen, node in enumerate(PATH):
+        WINDOW = pygame.display.set_mode((90 * DRAW_SCALE, 90 * DRAW_SCALE))
         WINDOW.fill(BACKGROUND_COLOR)
         for obstacle in obstacles:
             obstacle.draw(WINDOW)
@@ -76,4 +76,4 @@ if __name__ == "__main__":
         draw_goal(WINDOW)
         time.sleep(0.02)
         pygame.display.flip()
-        pygame.image.save(WINDOW, str(screen).zfill(4) + "screen.png")
+        # pygame.image.save(WINDOW, str(screen).zfill(4) + "screen.png")

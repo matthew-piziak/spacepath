@@ -54,12 +54,20 @@ def adjacent(node):
 def heuristic(node, goal, obstacles):
     """newtonian physics heuristic for A*"""
     for obstacle in obstacles:
-        if math.sqrt((node.x-obstacle.x)**2 + (node.y-obstacle.y)**2) < obstacle.radius:
-            return 1000
+        dx = abs(node.x - obstacle.x)
+        dy = abs(node.y - obstacle.y)
+        if dx + dy <= obstacle.radius:
+            return 10000
+        if dx > obstacle.radius:
+            continue
+        if dy > obstacle.radius:
+            continue
+        if dx**2 + dy**2 <= obstacle.radius**2:
+            return 10000
     pos_distance = math.sqrt((goal.x-node.x)**2 + (goal.y-node.y)**2)
-    opt_v_x = (goal.x-node.x) * ACCELERATION * 0.5
-    opt_v_y = (goal.y-node.y) * ACCELERATION * 0.5
-    vel_distance = math.sqrt((opt_v_x-node.v_x)**2 + (opt_v_y-node.v_y)**2)
+    opt_v_x = (goal.x-node.x) * ACCELERATION * 0.7
+    opt_v_y = (goal.y-node.y) * ACCELERATION * 0.7
+    vel_distance =  math.sqrt((opt_v_x-node.v_x)**2 + (opt_v_y-node.v_y)**2)
     return 1.01 * (pos_distance + vel_distance)
 
 def success(node, goal):

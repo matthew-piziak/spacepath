@@ -17,6 +17,7 @@ def a_star(start, goal, adjacent, heuristic, success):
     while open_set:
         node = heapq.heappop(open_heap)[1]
         if success(node, goal):
+            print(len(open_set))
             return _reconstruct_path(came_from, node)
         open_set.remove(node)
         closed_set.add(node)
