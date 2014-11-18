@@ -21,6 +21,10 @@ ANGLE_LENGTH = NODE_RADIUS * 1.5
 # obstacle constants
 NUM_OBSTACLES = random.randint(2, 8)
 
+# nodes
+START = newt.NewtNode(0, 0, 0, 0, 0)
+GOAL = newt.NewtNode(random.randint(70, 200), random.randint(70, 150), 0, 0, 0)
+
 class Obstacle(object):
     """an obstacle for the path to avoid"""
     def __init__(self, x, y, radius):
@@ -37,10 +41,10 @@ class Obstacle(object):
 def generate_random_obstacle():
     """generate random obstacle"""
     maximum_obstacle_radius = 15
-    max_x_position = newt.GOAL.x - maximum_obstacle_radius
-    max_y_position = newt.GOAL.y - maximum_obstacle_radius
-    min_x_position = newt.START.x + maximum_obstacle_radius
-    min_y_position = newt.START.y + maximum_obstacle_radius
+    max_x_position = GOAL.x - maximum_obstacle_radius
+    max_y_position = GOAL.y - maximum_obstacle_radius
+    min_x_position = START.x + maximum_obstacle_radius
+    min_y_position = START.y + maximum_obstacle_radius
     radius = random.randint(NODE_RADIUS + 1, maximum_obstacle_radius)
     x = random.randint(min_x_position, max_x_position)
     y = random.randint(min_y_position, max_y_position)
@@ -49,7 +53,7 @@ def generate_random_obstacle():
 
 def draw_goal(window):
     """draw goal"""
-    position = (newt.GOAL.x * DRAW_SCALE, newt.GOAL.y * DRAW_SCALE)
+    position = (GOAL.x * DRAW_SCALE, GOAL.y * DRAW_SCALE)
     pygame.draw.circle(window, GOAL_COLOR, position, NODE_RADIUS * 2)
 
 def draw_node(window, node):
@@ -75,8 +79,8 @@ def main():
     draw_scene(window, obstacles)
     draw_goal(window)
     pygame.display.flip()
-    PATH = pathing.a_star(newt.START,
-                          newt.GOAL,
+    PATH = pathing.a_star(START,
+                          GOAL,
                           newt.adjacent,
                           lambda n, g: newt.heuristic(n, g, obstacles),
                           newt.success)

@@ -1,35 +1,20 @@
 """Newtonian physics specificiations"""
 
 import math
-import random
+from collections import namedtuple
 
-class NewtNode(object):
-    """wrapper for node tuples"""
-    def __init__(self, x, y, v_x, v_y, angle):
-        self.x = x
-        self.y = y
-        self.v_x = v_x
-        self.v_y = v_y
-        self.angle = angle
-
-    # sort arbitarily
-    def __lt__(self, other):
-        return True
-
-START = NewtNode(0, 0, 0, 0, 0)
-GOAL = NewtNode(random.randint(70, 200), random.randint(70, 150), 0, 0, 0)
-ACCELERATION = 1
+NewtNode = namedtuple('NewtNode', ['x', 'y', 'v_x', 'v_y', 'angle'])
+Circle = namedtuple('Circle', ['x', 'y', 'radius'])
 
 def adj_position(node):
     """determines position for the next time step"""
     return [(node.x + node.v_x, node.y + node.v_y)]
 
-sin = {0: 0, 1: 1, 2: 1, 3: 1, 4: 0, 5: -1, 6: -1, 7: -1}
-cos = {0: 1, 1: 1, 2: 0, 3: -1, 4: -1, 5: -1, 6: 0, 7: 1}
-
 def adj_velocities(node):
-    """choices are burn or cruise"""
+    """assumes acceleration = 2 to use fast sine and cosine"""
     angle = node.angle
+    sin = {0: 0, 1: 1, 2: 1, 3: 1, 4: 0, 5: -1, 6: -1, 7: -1}
+    cos = {0: 1, 1: 1, 2: 0, 3: -1, 4: -1, 5: -1, 6: 0, 7: 1}
     delta_v_x = cos[angle]
     delta_v_y = sin[angle]
     cruise = (node.v_x, node.v_y)
@@ -54,29 +39,39 @@ def adjacent(node):
                 adj_nodes.append(adj_node)
     return adj_nodes
 
-def circle_contains(x, y, c_x, c_y, c_r):
-    dx = abs(x - c_x)
-    dy = abs(y - c_y)
-    if dx > c_r:
+def circle_contains_node(circle, node):
+    """returns whether the node is contained in the circle"""
+    dx = abs(node.x - circle.x)
+    dy = abs(node.y - circle.y)
+    if dx > circle.radius:
         return False
-    if dy > c_r:
+    if dy > circle.radius:
         return False
-    if dx + dy <= c_r:
+    if dx + dy <= circle.radius:
         return True
-    return dx**2 + dy**2 <= c_r**2
-
+    return (dx ** 2) + (dy ** 2) <= circle.radius ** 2
 
 def heuristic(node, goal, obstacles):
     """newtonian physics heuristic for A*"""
     for obstacle in obstacles:
-        if circle_contains(node.x, node.y, obstacle.x, obstacle.y, obstacle.radius):
+        circle = Circle(obstacle.x, obstacle.y, obstacle.radius)
+        if circle_contains_node(circle, node):
             return 1000000
-    heuristic_x = ((-1 * node.v_x) - (2 * goal.v_x) + math.sqrt((7 * (goal.v_x ** 2)) + (2 * (node.v_x ** 2)) + (4 * 2 * abs(goal.x - node.x)))) / 2
-    heuristic_y = ((-1 * node.v_y) - (2 * goal.v_y) + math.sqrt((7 * (goal.v_y ** 2)) + (2 * (node.v_y ** 2)) + (4 * 2 * abs(goal.y - node.y)))) / 2
+    acceleration = 2 # hardcoded for sine and cosine optimization
+    heuristic_x = ((-1 * node.v_x) - (2 * goal.v_x)
+                   + math.sqrt((7 * (goal.v_x ** 2))
+                               + (2 * (node.v_x ** 2))
+                               + (4 * acceleration * abs(goal.x - node.x)))) / 2
+    heuristic_y = ((-1 * node.v_y) - (2 * goal.v_y)
+                   + math.sqrt((7 * (goal.v_y ** 2))
+                               + (2 * (node.v_y ** 2))
+                               + (4 * acceleration * abs(goal.y - node.y)))) / 2
     return heuristic_x + heuristic_y
-        
+
 def success(node, goal):
     """success function for A*"""
-    location = circle_contains(node.x, node.y, goal.x, goal.y, 4)
+    success_radius = 4
+    success_region = Circle(goal.x, goal.y, success_radius)
+    location = circle_contains_node(success_region, node)
     speed = abs(node.v_x - goal.v_x) + abs(node.v_y - goal.v_y) == 0
     return location and speed
