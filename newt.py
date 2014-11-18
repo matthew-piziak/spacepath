@@ -17,21 +17,24 @@ class NewtNode(object):
         return True
 
 START = NewtNode(0, 0, 0, 0, 0)
-GOAL = NewtNode(random.randint(50, 150), random.randint(50, 150), 0, 0, 0)
+GOAL = NewtNode(180, 120, 0, 0, 0)
 ACCELERATION = 1
 
 def adj_position(node):
     """determines position for the next time step"""
     return [(node.x + node.v_x, node.y + node.v_y)]
 
+sin = {0: 0, 1: 1, 2: 1, 3: 1, 4: 0, 5: -1, 6: -1, 7: -1}
+cos = {0: 1, 1: 1, 2: 0, 3: -1, 4: -1, 5: -1, 6: 0, 7: 1}
+
 def adj_velocities(node):
     """choices are burn or cruise"""
-    angle = node.angle * (1 / 8) * 2 * math.pi
-    delta_v_x = int(math.cos(angle) * ACCELERATION)
-    delta_v_y = int(math.sin(angle) * ACCELERATION)
+    angle = node.angle
+    delta_v_x = cos[angle]
+    delta_v_y = sin[angle]
     cruise = (node.v_x, node.v_y)
     burn = (node.v_x + delta_v_x, node.v_y + delta_v_y)
-    return [burn, cruise]
+    return [burn]
 
 def adj_angles(node):
     """determines adjacent angles based on turning choice"""
@@ -68,19 +71,17 @@ def heuristic(node, goal, obstacles):
     for obstacle in obstacles:
         if circle_contains(node.x, node.y, obstacle.x, obstacle.y, obstacle.radius):
             return 1000000
-    distance = 0
-    x = node.x
-    y = node.y
+    distance = 1
     while True:
-        x += node.v_x
-        y += node.v_y
-        r = (distance**2) * ACCELERATION * 0.5
-        if circle_contains(goal.x, goal.y, x, y, r):
+        r = int((distance**2) * ACCELERATION * 0.5)
+        if circle_contains(goal.x,
+                           goal.y,
+                           node.v_x * distance,
+                           node.v_y * distance,
+                           r):
             return distance
         distance += 1
         
 def success(node, goal):
     """success function for A*"""
-    return circle_contains(node.x, node.y, goal.x, goal.y, 20)
-
-
+    return circle_contains(node.x, node.y, goal.x, goal.y, 15)

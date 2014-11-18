@@ -8,16 +8,16 @@ import math
 import time
 
 # drawing constants
-NODE_RADIUS = 5
-DRAW_SCALE = 5
+NODE_RADIUS = 10
+DRAW_SCALE = 3
 NODE_COLOR = (255, 255, 255)
 OBSTACLE_COLOR = (100, 100, 100)
 GOAL_COLOR = (100, 100, 255)
 BACKGROUND_COLOR = (0, 0, 0)
-ANGLE_LENGTH = 10
+ANGLE_LENGTH = NODE_RADIUS * 2
 
 # obstacle constants
-NUM_OBSTACLES = random.randint(1, 10)
+NUM_OBSTACLES = 6
 
 class Obstacle(object):
     """an obstacle for the path to avoid"""
@@ -34,12 +34,12 @@ class Obstacle(object):
 
 def generate_random_obstacle():
     """generate random obstacle"""
-    maximum_obstacle_radius = 20
+    maximum_obstacle_radius = 25
     max_x_position = newt.GOAL.x - maximum_obstacle_radius
     max_y_position = newt.GOAL.y - maximum_obstacle_radius
     min_x_position = newt.START.x + maximum_obstacle_radius
     min_y_position = newt.START.y + maximum_obstacle_radius
-    radius = random.randint(1, maximum_obstacle_radius)
+    radius = random.randint(NODE_RADIUS + 1, maximum_obstacle_radius)
     x = random.randint(min_x_position, max_x_position)
     y = random.randint(min_y_position, max_y_position)
     return Obstacle(x, y, radius)
@@ -69,8 +69,9 @@ if __name__ == "__main__":
     for _ in range(NUM_OBSTACLES):
         obstacle = generate_random_obstacle()
         obstacles.append(obstacle)
-    window = pygame.display.set_mode((190 * DRAW_SCALE, 190 * DRAW_SCALE))
+    window = pygame.display.set_mode((360 * DRAW_SCALE, 240 * DRAW_SCALE))
     draw_scene(window, obstacles)
+    draw_goal(window)
     pygame.display.flip()
     PATH = pathing.a_star(newt.START,
                           newt.GOAL,
@@ -83,7 +84,8 @@ if __name__ == "__main__":
         for adj in newt.adjacent(PATH[0]):
             draw_node(window, adj)
         pygame.display.flip()
-        time.sleep(2)
+        time.sleep(3)
+        exit()
     for screen, node in enumerate(PATH):
         draw_scene(window, obstacles)
         draw_node(window, node)

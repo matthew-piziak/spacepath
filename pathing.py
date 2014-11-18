@@ -16,7 +16,7 @@ def a_star(start, goal, adjacent, heuristic, success):
     seen.add(_node_to_tuple(start))
     while True:
         node = heapq.heappop(open_heap)[1]
-        if len(open_heap) > 400000:
+        if len(open_heap) > 800000:
             print((node.x, node.y, node.v_x, node.v_y, node.angle))
             print(g_score[node])
             print(heuristic(node, goal))
@@ -30,8 +30,9 @@ def a_star(start, goal, adjacent, heuristic, success):
             seen.add(_node_to_tuple(adj))
             came_from[adj] = node
             # adjacency is based on a constant time step
-            g_score[adj] = g_score[node] + 1 
-            f_score[adj] = g_score[adj] + heuristic(adj, goal)
+            g_score[adj] = g_score[node] + 1
+            h = heuristic(adj, goal)
+            f_score[adj] = g_score[adj] + h
             heapq.heappush(open_heap, (f_score[adj], adj))
 
 def _reconstruct_path(came_from, node):
