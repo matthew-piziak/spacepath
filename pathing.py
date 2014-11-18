@@ -12,16 +12,16 @@ def a_star(start, goal, adjacent, heuristic, success):
     g_score[start] = 0
     f_score[start] = g_score[start] + heuristic(start, goal)
     open_heap.append((f_score[start], start))
-    seen.add(_node_to_tuple(start))
+    seen.add(start)
     while True:
         node = heapq.heappop(open_heap)[1]
         if success(node, goal):
             print("heap: " + str(len(open_heap)))
             return _reconstruct_path(came_from, node)
         for adj in adjacent(node):
-            if _node_to_tuple(adj) in seen:
+            if adj in seen:
                 continue
-            seen.add(_node_to_tuple(adj))
+            seen.add(adj)
             came_from[adj] = node
             # adjacency is based on a constant time step
             g_score[adj] = g_score[node] + 1
@@ -36,7 +36,3 @@ def _reconstruct_path(came_from, node):
         return path + [node]
     else:
         return [node]
-
-def _node_to_tuple(node):
-    """convert node to tuple for score caching"""
-    return (node.x, node.y, node.v_x, node.v_y, node.angle)
