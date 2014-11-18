@@ -3,7 +3,7 @@
 import math
 from collections import namedtuple
 
-NewtNode = namedtuple('NewtNode', ['x', 'y', 'v_x', 'v_y', 'angle'])
+Node = namedtuple('Node', ['x', 'y', 'v_x', 'v_y', 'angle'])
 Circle = namedtuple('Circle', ['x', 'y', 'radius'])
 
 def adj_position(node):
@@ -35,7 +35,7 @@ def adjacent(node):
     for pos in adj_position(node):
         for vel in adj_velocities(node):
             for angle in adj_angles(node):
-                adj_node = NewtNode(pos[0], pos[1], vel[0], vel[1], angle)
+                adj_node = Node(pos[0], pos[1], vel[0], vel[1], angle)
                 adj_nodes.append(adj_node)
     return adj_nodes
 

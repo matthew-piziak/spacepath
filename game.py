@@ -20,11 +20,11 @@ BACKGROUND_COLOR = (0, 0, 0)
 ANGLE_LENGTH = NODE_RADIUS * 1.5
 
 # obstacle constants
-NUM_OBSTACLES = random.randint(2, 8)
+NUM_OBSTACLES = 0
 
 # nodes
-START = newt.NewtNode(0, 0, 0, 0, 0)
-GOAL = newt.NewtNode(random.randint(70, 200), random.randint(70, 150), 0, 0, 0)
+START = newt.Node(0, 0, 0, 0, 0)
+GOAL = newt.Node(120, 90, 0, 0, 0)
 
 def draw_obstacle(window, obstacle):
     """draw obstacle"""
@@ -75,11 +75,15 @@ def main():
     draw_scene(window, obstacles)
     draw_goal(window)
     pygame.display.flip()
+    start = time.clock()
     path = pathing.a_star(START,
                           GOAL,
                           newt.adjacent,
                           lambda n, g: newt.heuristic(n, g, obstacles),
                           newt.success)
+    end = time.clock()
+    elapsed = end - start
+    print("time: " + str(elapsed))
     filelist = [f for f in os.listdir(".") if f.endswith(".png")]
     for filename in filelist:
         os.remove(filename)
@@ -95,5 +99,4 @@ def main():
     subprocess.Popen(gif_command.split(), stdout=subprocess.PIPE)
 
 if __name__ == "__main__":
-    while True:
-        main()
+    main()
