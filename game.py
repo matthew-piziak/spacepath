@@ -26,8 +26,6 @@ NUM_OBSTACLES = random.randint(2, 8)
 START = newt.NewtNode(0, 0, 0, 0, 0)
 GOAL = newt.NewtNode(random.randint(70, 200), random.randint(70, 150), 0, 0, 0)
 
-Obstacle = namedtuple('Obstacle', ['x', 'y', 'radius'])
-
 def draw_obstacle(window, obstacle):
     """draw obstacle"""
     location = (obstacle.x * DRAW_SCALE, obstacle.y * DRAW_SCALE)
@@ -44,7 +42,7 @@ def generate_random_obstacle():
     radius = random.randint(NODE_RADIUS + 1, maximum_obstacle_radius)
     x = random.randint(min_x_position, max_x_position)
     y = random.randint(min_y_position, max_y_position)
-    return Obstacle(x, y, radius)
+    return newt.Circle(x, y, radius)
 
 
 def draw_goal(window):
@@ -82,14 +80,6 @@ def main():
                           newt.adjacent,
                           lambda n, g: newt.heuristic(n, g, obstacles),
                           newt.success)
-    if len(path) == 1:
-        draw_scene(window, obstacles)
-        draw_node(window, path[0])
-        for adj in newt.adjacent(path[0]):
-            draw_node(window, adj)
-        pygame.display.flip()
-        time.sleep(3)
-        exit()
     filelist = [f for f in os.listdir(".") if f.endswith(".png")]
     for filename in filelist:
         os.remove(filename)
