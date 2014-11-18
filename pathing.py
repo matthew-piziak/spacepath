@@ -16,13 +16,13 @@ def a_star(start, goal, adjacent, heuristic, success):
     seen.add(_node_to_tuple(start))
     while True:
         node = heapq.heappop(open_heap)[1]
-        if len(open_heap) > 800000:
+        if len(open_heap) > 3200000:
             print((node.x, node.y, node.v_x, node.v_y, node.angle))
             print(g_score[node])
             print(heuristic(node, goal))
             return [node]
         if success(node, goal):
-            print(len(open_heap))
+            print("heap: " + str(len(open_heap)))
             return _reconstruct_path(came_from, node)
         for adj in adjacent(node):
             if _node_to_tuple(adj) in seen:
