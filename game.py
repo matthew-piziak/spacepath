@@ -20,7 +20,7 @@ BACKGROUND_COLOR = (0, 0, 0)
 ANGLE_LENGTH = NODE_RADIUS * 1.5
 
 # obstacle constants
-NUM_OBSTACLES = 0
+NUM_OBSTACLES = 4
 
 # nodes
 START = newt.Node(0, 0, 0, 0, 0)
