@@ -58,14 +58,12 @@ def heuristic(node, goal, obstacles):
         if circle_contains_node(circle, node):
             return 1000000
     acceleration = 2 # hardcoded for sine and cosine optimization
-    heuristic_x = ((-1 * node.v_x) - (2 * goal.v_x)
-                   + math.sqrt((7 * (goal.v_x ** 2))
-                               + (2 * (node.v_x ** 2))
-                               + (4 * acceleration * abs(goal.x - node.x)))) / 2
-    heuristic_y = ((-1 * node.v_y) - (2 * goal.v_y)
-                   + math.sqrt((7 * (goal.v_y ** 2))
-                               + (2 * (node.v_y ** 2))
-                               + (4 * acceleration * abs(goal.y - node.y)))) / 2
+    heuristic_x = (- node.v_x +
+                   math.sqrt((2 * (node.v_x ** 2)) + 
+                             (4 * acceleration * abs(goal.x - node.x)))) / 2
+    heuristic_y = (- node.v_y + 
+                   math.sqrt((2 * (node.v_y ** 2)) + 
+                            (4 * acceleration * abs(goal.y - node.y)))) / 2
     return heuristic_x + heuristic_y
 
 def success(node, goal):
