@@ -13,7 +13,7 @@ from scipy import interpolate
 import numpy as np
 
 # obstacle constants
-NUM_OBSTACLES = random.randint(0, 12)
+NUM_OBSTACLES = 3
 
 # drawing constants
 NODE_RADIUS = 30
@@ -31,7 +31,7 @@ GOAL = newt.Node(60, 40, 0, 0, 0)
 def draw_obstacle(window, obstacle):
     """draw obstacle"""
     location = (obstacle.x * DRAW_SCALE, obstacle.y * DRAW_SCALE)
-    radius = (obstacle.radius * DRAW_SCALE) - NODE_RADIUS
+    radius = (obstacle.radius * DRAW_SCALE) - (NODE_RADIUS + 2)
     pygame.draw.circle(window, OBSTACLE_COLOR, location, radius)
 
 def generate_random_obstacle():
@@ -50,7 +50,7 @@ def generate_random_obstacle():
 def draw_goal(window):
     """draw goal"""
     position = (GOAL.x * DRAW_SCALE, GOAL.y * DRAW_SCALE)
-    pygame.draw.circle(window, GOAL_COLOR, position, NODE_RADIUS * 2)
+    pygame.draw.circle(window, GOAL_COLOR, position, NODE_RADIUS * 3)
 
 def draw_node(window, node):
     """draw node"""
@@ -96,21 +96,19 @@ def main():
         node_x.append(node.x)
         node_y.append(node.y)
     t = np.arange(0, len(node_x))
-    print(len(t))
-    print(len(node_x))
-    print(len(node_y))
-    f_x = interpolate.interp1d(t, node_x)
-    f_y = interpolate.interp1d(t, node_y)
+    f_x = interpolate.interp1d(t, node_x, 'cubic')
+    f_y = interpolate.interp1d(t, node_y, 'cubic')
     t_new = np.arange(0, len(node_x) - 2, 0.1)
     x_i = f_x(t_new)
     y_i = f_y(t_new)
     for screen, node in enumerate(path):
-        draw_scene(window, obstacles)
-        draw_goal(window)
         for i in range(screen * 10, screen * 10 + 9):
-            draw_dot(window, x_i[i], y_i[i])
-        time.sleep(0.03)
-        pygame.display.flip()
+            if len(x_i) > i:
+                draw_scene(window, obstacles)
+                draw_goal(window)
+                draw_dot(window, x_i[i], y_i[i])
+                time.sleep(0.02)
+                pygame.display.flip()
         pygame.image.save(window, str(screen).zfill(4) + "screen.png")
     print("label: " + str(int(time.time())))
     gif_command = "bash make_gif.sh maneuver" + str(int(time.time())) + ".gif"
