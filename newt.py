@@ -63,7 +63,7 @@ def heuristic(node, goal, obstacles):
                              (4 * acceleration * abs(goal.x - node.x)))) / 2
     heuristic_y = (- node.v_y +
                    math.sqrt((2 * (node.v_y ** 2)) +
-                            (4 * acceleration * abs(goal.y - node.y)))) / 2
+                             (4 * acceleration * abs(goal.y - node.y)))) / 2
     return heuristic_x + heuristic_y
 
 def success(node, goal):
