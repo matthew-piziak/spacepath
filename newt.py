@@ -68,7 +68,7 @@ def heuristic(node, goal, obstacles):
 
 def success(node, goal):
     """success function for A*"""
-    success_radius = 4
+    success_radius = 8
     success_region = Circle(goal.x, goal.y, success_radius)
     location = circle_contains_node(success_region, node)
     speed = abs(node.v_x - goal.v_x) + abs(node.v_y - goal.v_y) == 0
