@@ -13,11 +13,11 @@ from scipy import interpolate
 import numpy as np
 
 # obstacle constants
-NUM_OBSTACLES = 12
+NUM_OBSTACLES = 16
 
 # drawing constants
-NODE_RADIUS = 11
-DRAW_SCALE = 7
+NODE_RADIUS = 12
+DRAW_SCALE = 16
 NODE_COLOR = (255, 255, 255)
 OBSTACLE_COLOR = (100, 100, 100)
 GOAL_COLOR = (100, 100, 255)
@@ -26,12 +26,12 @@ ANGLE_LENGTH = NODE_RADIUS * 1.5
 
 # nodes
 START = newt.Node(0, 0, 0, 0, 0)
-GOAL = newt.Node(100, 75, 0, 0, 0)
+GOAL = newt.Node(70, 30, 0, 0, 0)
 
 def draw_obstacle(window, obstacle):
     """draw obstacle"""
     location = (obstacle.x * DRAW_SCALE, obstacle.y * DRAW_SCALE)
-    radius = (obstacle.radius * DRAW_SCALE) - int(2.7 * DRAW_SCALE)
+    radius = (obstacle.radius * DRAW_SCALE) - int(2.8 * DRAW_SCALE)
     pygame.draw.circle(window, OBSTACLE_COLOR, location, radius)
 
 def generate_random_obstacle():
@@ -50,8 +50,7 @@ def generate_random_obstacle():
 def draw_goal(window):
     """draw goal"""
     position = (GOAL.x * DRAW_SCALE, GOAL.y * DRAW_SCALE)
-    pygame.draw.circle(window, GOAL_COLOR, position, NODE_RADIUS)
-
+    pygame.draw.circle(window, GOAL_COLOR, position, NODE_RADIUS * 4)
 def draw_node(window, node):
     """draw node"""
     node_x = int(node.x * DRAW_SCALE)
@@ -100,7 +99,7 @@ def main():
     t = np.arange(0, len(node_x))
     f_x = interpolate.interp1d(t, node_x, 'cubic')
     f_y = interpolate.interp1d(t, node_y, 'cubic')
-    t_new = np.arange(0, len(node_x) - 2, 0.5)
+    t_new = np.arange(0, len(node_x) - 2, 0.2)
     x_i = f_x(t_new)
     y_i = f_y(t_new)
     for i in range(len(t_new)):
