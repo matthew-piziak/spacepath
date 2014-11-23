@@ -51,13 +51,38 @@ def circle_contains_node(circle, node):
         return True
     return (dx ** 2) + (dy ** 2) <= circle.radius ** 2
 
-def heuristic(node, goal, obstacles):
+def heuristic(node, goal, obstacles, bounds):
     """newtonian physics heuristic for A*"""
-    for obstacle in obstacles:
-        circle = Circle(obstacle.x, obstacle.y, obstacle.radius)
-        if circle_contains_node(circle, node):
-            return 1000000
     acceleration = 2 # hardcoded for sine and cosine optimization
+    def outside_arena():
+        lower_bounded = node.x > 0 and node.y > 0
+        upper_bounded = node.x < bounds[0] and node.y < bounds[1] 
+        return not (lower_bounded and upper_bounded)
+    def leaving_arena():
+        if node.v_x > 0:
+            braking_time = node.v_x // acceleration
+            braking_distance = (node.v_x * braking_time) + (0.5 * acceleration * braking_time)
+            return braking_distance > bounds[0] - node.x
+        if node.v_y > 0:
+            braking_time = node.v_y // acceleration
+            braking_distance = (node.v_y * braking_time) + (0.5 * acceleration * braking_time)
+            return braking_distance > bounds[0] - node.y
+        if node.v_x < -1:
+            braking_time = abs(node.v_x) // acceleration
+            braking_distance = (abs(node.v_x * braking_time) + (0.5 * acceleration * braking_time))
+            return braking_distance > node.x
+        if node.v_y < -1:
+            braking_time = abs(node.v_y) // acceleration
+            braking_distance = (abs(node.v_y * braking_time) + (0.5 * acceleration * braking_time))
+            return braking_distance > node.y
+    def in_obstacle():
+        def obstacle_contains_node(obstacle):
+            circle = Circle(obstacle.x, obstacle.y, obstacle.radius)
+            return circle_contains_node(circle, node)
+        return any([obstacle_contains_node(o) for o in obstacles])
+    H_MAX = 1000000
+    if outside_arena() or leaving_arena() or in_obstacle():
+        return H_MAX
     heuristic_x = (- node.v_x +
                    math.sqrt((2 * (node.v_x ** 2)) +
                              (4 * acceleration * abs(goal.x - node.x)))) / 2
