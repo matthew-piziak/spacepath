@@ -12,7 +12,7 @@ from scipy import interpolate
 import numpy as np
 
 # obstacle constants
-NUM_OBSTACLES = 10
+NUM_OBSTACLES = 8
 
 # drawing constants
 NODE_RADIUS = 2
@@ -28,13 +28,13 @@ START = newt.Node(0, 0, 0, 0, 0)
 GOAL = newt.Node(150, 75, 0, 0, 0)
 
 # interpolation
-INTERPOLATE = False
+INTERPOLATE = True
 INTERPOLATION_FACTOR = 4
 
 def draw_obstacle(window, obstacle):
     """draw obstacle"""
     location = (obstacle.x * DRAW_SCALE, obstacle.y * DRAW_SCALE)
-    radius = (obstacle.radius * DRAW_SCALE) - int(NODE_RADIUS * DRAW_SCALE * 2)
+    radius = (obstacle.radius * DRAW_SCALE) - int(NODE_RADIUS * DRAW_SCALE * 1.4)
     pygame.draw.circle(window, OBSTACLE_COLOR, location, radius)
 
 def generate_random_obstacle():
@@ -84,6 +84,28 @@ def clear_images():
     for filename in filelist:
         os.remove(filename)
 
+def interpolate_angles(angles):
+    interpolated_angles = []
+    fraction = 1.0 / INTERPOLATION_FACTOR
+    for i in range(len(angles) - 1):
+        if abs(angles[i + 1] - angles[i]) <= 4:
+            for f in range(INTERPOLATION_FACTOR):
+                interpolated_angle = ((INTERPOLATION_FACTOR - f) * fraction * float(angles[i])) + (f * fraction * float(angles[i + 1]))
+                interpolated_angles.append(interpolated_angle)
+        else:
+            for f in range(INTERPOLATION_FACTOR):
+                start_angle = angles[i]
+                end_angle = angles[i + 1]
+                if start_angle < 4:
+                    start_angle += 8
+                if end_angle < 4:
+                    end_angle += 8
+                interpolated_angle = ((INTERPOLATION_FACTOR - f) * fraction * float(start_angle)) + (f * fraction * float(end_angle))
+                interpolated_angle = interpolated_angle % 8
+                interpolated_angles.append(interpolated_angle)
+    return interpolated_angles
+            
+
 def interpolate_path(path):
     """generate a higher resolution path using cubic spline interpolation"""
     node_positions = [(n.x, n.y, n.angle) for n in path]
@@ -93,9 +115,11 @@ def interpolate_path(path):
     t = np.arange(0, len(node_positions))
     f_x = interpolate.interp1d(t, [p[0] for p in node_positions], 'cubic')
     f_y = interpolate.interp1d(t, [p[1] for p in node_positions], 'cubic')
-    f_angle = interpolate.interp1d(t, [p[2] for p in node_positions], 'linear')
     t_new = np.arange(0, len(node_positions) - 2, 1.0 / INTERPOLATION_FACTOR)
-    return zip(f_x(t_new), f_y(t_new), f_angle(t_new))
+    interpolated_x = f_x(t_new)
+    interpolated_y = f_y(t_new)
+    interpolated_angle = interpolate_angles([p[2] for p in node_positions])
+    return zip(interpolated_x, interpolated_y, interpolated_angle)
 
 def main():
     """generate path and render"""
