@@ -12,7 +12,7 @@ from scipy import interpolate
 import numpy as np
 
 # obstacle constants
-NUM_OBSTACLES = 8
+NUM_OBSTACLES = 4
 
 # drawing constants
 NODE_RADIUS = 2
@@ -141,11 +141,10 @@ def main():
         draw_goal(window)
         draw_node(window, node[0], node[1], node[2])
         pygame.display.flip()
-        pygame.image.save(window, str(i).zfill(4) + "screen.png")
-    print("label: " + str(int(time.time())))
-    gif_command = "bash make_gif.sh maneuver" + str(int(time.time())) + ".gif"
-    subprocess.Popen(gif_command.split(), stdout=subprocess.PIPE)
+        # pygame.image.save(window, str(i).zfill(4) + "screen.png")
+    #print("label: " + str(int(time.time())))
+    #gif_command = "bash make_gif.sh maneuver" + str(int(time.time())) + ".gif"
+    #subprocess.Popen(gif_command.split(), stdout=subprocess.PIPE)
 
 if __name__ == "__main__":
     main()
-    
