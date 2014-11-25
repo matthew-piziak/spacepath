@@ -14,9 +14,13 @@ import numpy as np
 # obstacle constants
 NUM_OBSTACLES = 4
 
+# interpolation
+INTERPOLATE = True
+INTERPOLATION_FACTOR = 10
+
 # drawing constants
 NODE_RADIUS = 2
-DRAW_SCALE = 8
+DRAW_SCALE = 5
 NODE_COLOR = (255, 255, 255)
 OBSTACLE_COLOR = (100, 100, 100)
 GOAL_COLOR = (100, 100, 255)
@@ -25,22 +29,18 @@ ANGLE_LENGTH = 6
 
 # nodes
 START = newt.Node(0, 0, 0, 0, 0)
-GOAL = newt.Node(150, 75, 0, 0, 0)
-
-# interpolation
-INTERPOLATE = True
-INTERPOLATION_FACTOR = 4
+GOAL = newt.Node(200, 100, 0, 0, 0)
 
 def draw_obstacle(window, obstacle):
     """draw obstacle"""
     location = (obstacle.x * DRAW_SCALE, obstacle.y * DRAW_SCALE)
-    radius = (obstacle.radius * DRAW_SCALE) - int(NODE_RADIUS * DRAW_SCALE * 1.4)
+    radius = (obstacle.radius * DRAW_SCALE) - int(NODE_RADIUS * DRAW_SCALE * 1.5)
     pygame.draw.circle(window, OBSTACLE_COLOR, location, radius)
 
 def generate_random_obstacle():
     """generate random obstacle"""
     maximum_obstacle_radius = 16
-    minimum_obstacle_radius = NODE_RADIUS * 2
+    minimum_obstacle_radius = NODE_RADIUS * 3
     max_x_position = GOAL.x - maximum_obstacle_radius
     max_y_position = GOAL.y - maximum_obstacle_radius
     min_x_position = START.x + maximum_obstacle_radius
@@ -53,7 +53,7 @@ def generate_random_obstacle():
 def draw_goal(window):
     """draw goal"""
     position = (GOAL.x * DRAW_SCALE, GOAL.y * DRAW_SCALE)
-    goal_draw_radius = NODE_RADIUS * DRAW_SCALE * 3
+    goal_draw_radius = NODE_RADIUS * DRAW_SCALE * 4
     pygame.draw.circle(window, GOAL_COLOR, position, goal_draw_radius)
 
 def draw_node(window, x, y, angle):
@@ -121,6 +121,15 @@ def interpolate_path(path):
     interpolated_angle = interpolate_angles([p[2] for p in node_positions])
     return zip(interpolated_x, interpolated_y, interpolated_angle)
 
+def save_image(window, i):
+    pygame.image.save(window, str(i).zfill(4) + "screen.png")
+
+def make_gif():
+    label = str(int(time.time()))
+    print("label: " + label)
+    gif_command = "bash make_gif.sh maneuver" + label + ".gif"
+    subprocess.Popen(gif_command.split(), stdout=subprocess.PIPE)
+
 def main():
     """generate path and render"""
     obstacles = []
@@ -141,10 +150,7 @@ def main():
         draw_goal(window)
         draw_node(window, node[0], node[1], node[2])
         pygame.display.flip()
-        # pygame.image.save(window, str(i).zfill(4) + "screen.png")
-    #print("label: " + str(int(time.time())))
-    #gif_command = "bash make_gif.sh maneuver" + str(int(time.time())) + ".gif"
-    #subprocess.Popen(gif_command.split(), stdout=subprocess.PIPE)
-
+        time.sleep(0.01)
+    
 if __name__ == "__main__":
     main()
