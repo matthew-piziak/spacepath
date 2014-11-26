@@ -19,7 +19,8 @@ def adj_velocities(node):
     delta_v_y = sin[angle]
     cruise = (node.v_x, node.v_y)
     burn = (node.v_x + delta_v_x, node.v_y + delta_v_y)
-    return [burn, cruise]
+    velocities = [burn, cruise]
+    return velocities
 
 def adj_angles(node):
     """determines adjacent angles based on turning choice"""
@@ -55,28 +56,32 @@ def heuristic(node, goal, obstacles, bounds):
     """newtonian physics heuristic for A*"""
     acceleration = 2 # hardcoded for sine and cosine optimization
     def outside_arena():
-        lower_bounded = node.x > 0 and node.y > 0
-        upper_bounded = node.x < bounds[0] and node.y < bounds[1] 
-        return not (lower_bounded and upper_bounded)
+        """determines if the node is outside permissible bounds"""
+        return not (0 < node.x < bounds[0] and 0 < node.y < bounds[1])
     def leaving_arena():
+        """determines if the node is moving too fast to remain in the arena"""
+        braking_time_x = abs(node.v_x // acceleration)
+        braking_time_y = abs(node.v_y // acceleration)
         if node.v_x > 0:
-            braking_time = node.v_x // acceleration
-            braking_distance = (node.v_x * braking_time) + (0.5 * acceleration * braking_time)
-            return braking_distance > bounds[0] - node.x
+            braking_distance = (node.v_x * braking_time_x) + (0.5 * acceleration * braking_time_x)
+            if braking_distance > bounds[0] - node.x:
+                return True
         if node.v_y > 0:
-            braking_time = node.v_y // acceleration
-            braking_distance = (node.v_y * braking_time) + (0.5 * acceleration * braking_time)
-            return braking_distance > bounds[0] - node.y
+            braking_distance = (node.v_y * braking_time_x) + (0.5 * acceleration * braking_time_y)
+            if braking_distance > bounds[0] - node.y:
+                return True
         if node.v_x < -1:
-            braking_time = abs(node.v_x) // acceleration
-            braking_distance = (abs(node.v_x * braking_time) + (0.5 * acceleration * braking_time))
-            return braking_distance > node.x
+            braking_distance = (abs(node.v_x * braking_time_x) + (0.5 * acceleration * braking_time_x))
+            if braking_distance > node.x:
+                return True
         if node.v_y < -1:
-            braking_time = abs(node.v_y) // acceleration
-            braking_distance = (abs(node.v_y * braking_time) + (0.5 * acceleration * braking_time))
-            return braking_distance > node.y
+            braking_distance = (abs(node.v_y * braking_time_x) + (0.5 * acceleration * braking_time_y))
+            if braking_distance > node.y:
+                return True
     def in_obstacle():
+        """determines if the node is inside an obstacle"""
         def obstacle_contains_node(obstacle):
+            """determines collision for a single obstacle"""
             circle = Circle(obstacle.x, obstacle.y, obstacle.radius)
             return circle_contains_node(circle, node)
         return any([obstacle_contains_node(o) for o in obstacles])
@@ -89,11 +94,11 @@ def heuristic(node, goal, obstacles, bounds):
     heuristic_y = (- node.v_y +
                    math.sqrt((2 * (node.v_y ** 2)) +
                              (4 * acceleration * abs(goal.y - node.y)))) / 2
-    return 1.05 * (heuristic_x + heuristic_y)
+    return 1.02 * (heuristic_x + heuristic_y)
 
 def success(node, goal):
     """success function for A*"""
-    success_radius = 8
+    success_radius = 6
     success_region = Circle(goal.x, goal.y, success_radius)
     location = circle_contains_node(success_region, node)
     speed = abs(node.v_x - goal.v_x) + abs(node.v_y - goal.v_y) == 0
