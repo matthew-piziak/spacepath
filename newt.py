@@ -60,23 +60,25 @@ def heuristic(node, goal, obstacles, bounds):
         return not (0 < node.x < bounds[0] and 0 < node.y < bounds[1])
     def leaving_arena():
         """determines if the node is moving too fast to remain in the arena"""
-        braking_time_x = abs(node.v_x // acceleration)
-        braking_time_y = abs(node.v_y // acceleration)
+        braking_time_x = abs(node.v_x) // acceleration
+        braking_time_y = abs(node.v_y) // acceleration
+        v_component_x = abs(node.v_x) * braking_time_x
+        v_component_y = abs(node.v_y) * braking_time_y
+        a_component_x = 0.5 * acceleration * braking_time_x
+        a_component_y = 0.5 * acceleration * braking_time_y
+        braking_distance_x = v_component_x + a_component_x
+        braking_distance_y = v_component_y + a_component_y
         if node.v_x > 0:
-            braking_distance = (node.v_x * braking_time_x) + (0.5 * acceleration * braking_time_x)
-            if braking_distance > bounds[0] - node.x:
+            if braking_distance_x > bounds[0] - node.x:
                 return True
         if node.v_y > 0:
-            braking_distance = (node.v_y * braking_time_x) + (0.5 * acceleration * braking_time_y)
-            if braking_distance > bounds[0] - node.y:
+            if braking_distance_y > bounds[0] - node.y:
                 return True
         if node.v_x < -1:
-            braking_distance = (abs(node.v_x * braking_time_x) + (0.5 * acceleration * braking_time_x))
-            if braking_distance > node.x:
+            if braking_distance_x > node.x:
                 return True
         if node.v_y < -1:
-            braking_distance = (abs(node.v_y * braking_time_x) + (0.5 * acceleration * braking_time_y))
-            if braking_distance > node.y:
+            if braking_distance_y > node.y:
                 return True
     def in_obstacle():
         """determines if the node is inside an obstacle"""
@@ -85,9 +87,9 @@ def heuristic(node, goal, obstacles, bounds):
             circle = Circle(obstacle.x, obstacle.y, obstacle.radius)
             return circle_contains_node(circle, node)
         return any([obstacle_contains_node(o) for o in obstacles])
-    H_MAX = 1000000
+    h_max = 1000000
     if outside_arena() or leaving_arena() or in_obstacle():
-        return H_MAX
+        return h_max
     heuristic_x = (- node.v_x +
                    math.sqrt((2 * (node.v_x ** 2)) +
                              (4 * acceleration * abs(goal.x - node.x)))) / 2
