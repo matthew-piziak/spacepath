@@ -12,35 +12,35 @@ from scipy import interpolate
 import numpy as np
 
 # obstacle constants
-NUM_OBSTACLES = 4
+NUM_OBSTACLES = 12
 
 # interpolation
 INTERPOLATE = True
-INTERPOLATION_FACTOR = 10
+INTERPOLATION_FACTOR = 16
 
 # drawing constants
-NODE_RADIUS = 2
-DRAW_SCALE = 5
+NODE_RADIUS = 3
+DRAW_SCALE = 4
 NODE_COLOR = (255, 255, 255)
 OBSTACLE_COLOR = (100, 100, 100)
 GOAL_COLOR = (100, 100, 255)
 BACKGROUND_COLOR = (0, 0, 0)
-ANGLE_LENGTH = 6
+ANGLE_LENGTH = 2 * NODE_RADIUS
 
 # nodes
-START = newt.Node(0, 0, 0, 0, 0)
-GOAL = newt.Node(200, 100, 0, 0, 0)
+START = newt.Node(0, 0, 0, 0, 1)
+GOAL = newt.Node(160, 160, 0, 0, 0)
 
 def draw_obstacle(window, obstacle):
     """draw obstacle"""
     location = (obstacle.x * DRAW_SCALE, obstacle.y * DRAW_SCALE)
-    radius = (obstacle.radius * DRAW_SCALE) - int(NODE_RADIUS * DRAW_SCALE * 1.5)
+    radius = (obstacle.radius * DRAW_SCALE) - int(NODE_RADIUS * DRAW_SCALE * 1.4)
     pygame.draw.circle(window, OBSTACLE_COLOR, location, radius)
 
 def generate_random_obstacle():
     """generate random obstacle"""
-    maximum_obstacle_radius = 16
-    minimum_obstacle_radius = NODE_RADIUS * 3
+    maximum_obstacle_radius = 18
+    minimum_obstacle_radius = NODE_RADIUS * 4
     max_x_position = GOAL.x - maximum_obstacle_radius
     max_y_position = GOAL.y - maximum_obstacle_radius
     min_x_position = START.x + maximum_obstacle_radius
@@ -65,7 +65,7 @@ def draw_node(window, x, y, angle):
     node_angle = (math.pi / 4) * float(angle)
     angle_x = (math.cos(node_angle) * DRAW_SCALE * ANGLE_LENGTH) + node_x
     angle_y = (math.sin(node_angle) * DRAW_SCALE * ANGLE_LENGTH) + node_y
-    pygame.draw.line(window, NODE_COLOR, (node_x, node_y), (angle_x, angle_y), 3)
+    pygame.draw.line(window, NODE_COLOR, (node_x, node_y), (angle_x, angle_y), 2)
 
 def draw_scene(window, obstacles):
     """draw scene"""
@@ -85,6 +85,7 @@ def clear_images():
         os.remove(filename)
 
 def interpolate_angles(angles):
+    """custom linear modulus interpolation for angles"""
     interpolated_angles = []
     fraction = 1.0 / INTERPOLATION_FACTOR
     for i in range(len(angles) - 1):
@@ -104,7 +105,7 @@ def interpolate_angles(angles):
                 interpolated_angle = interpolated_angle % 8
                 interpolated_angles.append(interpolated_angle)
     return interpolated_angles
-            
+
 
 def interpolate_path(path):
     """generate a higher resolution path using cubic spline interpolation"""
@@ -122,9 +123,11 @@ def interpolate_path(path):
     return zip(interpolated_x, interpolated_y, interpolated_angle)
 
 def save_image(window, i):
+    """save screenshot to disk"""
     pygame.image.save(window, str(i).zfill(4) + "screen.png")
 
 def make_gif():
+    """generate a gif from the accumulated screenshots"""
     label = str(int(time.time()))
     print("label: " + label)
     gif_command = "bash make_gif.sh maneuver" + label + ".gif"
@@ -133,7 +136,7 @@ def make_gif():
 def main():
     """generate path and render"""
     obstacles = []
-    for _ in range(NUM_OBSTACLES):
+    for _ in range(random.randint(0, NUM_OBSTACLES)):
         obstacle = generate_random_obstacle()
         obstacles.append(obstacle)
     bounds = (GOAL.x + 10, GOAL.y + 10)
@@ -145,12 +148,13 @@ def main():
     path = get_path(obstacles, bounds)
     interpolated_path = interpolate_path(path)
     clear_images()
-    for i, node in enumerate(interpolated_path):
+    for node in interpolated_path:
         draw_scene(window, obstacles)
         draw_goal(window)
         draw_node(window, node[0], node[1], node[2])
         pygame.display.flip()
-        time.sleep(0.01)
-    
+        time.sleep(0.005)
+
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
