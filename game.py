@@ -1,8 +1,5 @@
 """Game runner"""
 
-import subprocess
-import os
-
 import pygame
 
 import newt
@@ -25,7 +22,7 @@ def main():
     window = draw.init(obstacles, GOAL)
     pygame.display.flip()
     path = get_path(obstacles, bounds)
-    draw.path(window, obstacles, GOAL, path)
+    draw.animate_path(window, obstacles, GOAL, path)
 
 if __name__ == "__main__":
     while True:

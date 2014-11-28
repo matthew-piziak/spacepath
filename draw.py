@@ -17,18 +17,20 @@ ANGLE_LENGTH = 2 * NODE_RADIUS
 # animation
 FRAME_STEP = 0.005
 
-def init(obstacles, GOAL):
-    window_dimensions = ((GOAL.x + 10) * DRAW_SCALE, (GOAL.y + 10) * DRAW_SCALE)
+def init(obstacles, goal):
+    """draw initial scene and obstacles"""
+    window_dimensions = ((goal.x + 10) * DRAW_SCALE, (goal.y + 10) * DRAW_SCALE)
     window = pygame.display.set_mode(window_dimensions)
     _scene(window, obstacles)
-    _goal(window, GOAL)
+    _goal(window, goal)
     return window
 
-def path(window, obstacles, GOAL, path):
+def animate_path(window, obstacles, goal, path):
+    """animate path"""
     interpolated_path = interpolate.path(path)
     for node in interpolated_path:
         _scene(window, obstacles)
-        _goal(window, GOAL)
+        _goal(window, goal)
         _node(window, node[0], node[1], node[2])
         pygame.display.flip()
         time.sleep(FRAME_STEP)

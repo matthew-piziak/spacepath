@@ -70,7 +70,9 @@ def heuristic(node, goal, obstacles, bounds):
                 return True
     def in_obstacle():
         """determines if the node is inside an obstacle"""
-        return any([obstacle.contains_node(node.x, node.y, o) for o in obstacles])
+        x = node.x
+        y = node.y
+        return any([obstacle.contains_node(x, y, o) for o in obstacles])
     h_max = 1000000
     if outside_arena() or leaving_arena() or in_obstacle():
         return h_max
