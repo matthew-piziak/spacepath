@@ -23,10 +23,11 @@ class Ship(pygame.sprite.Sprite):
     def __init__(self, x, y, angle, action):
         scale = NODE_RADIUS * DRAW_SCALE * 2
         image = pygame.image.load("ship.png")
-        if action == "burn":
+        if action == "cruise":
             image = pygame.image.load("ship_burn.png")
-        image = pygame.transform.scale(image, (scale, scale))
-        image = pygame.transform.rotate(image, angle * 45)
+        image = pygame.transform.smoothscale(image, (scale, scale))
+        image = self._rot_center(image, -90)
+        image = self._rot_center(image, -1 * angle * 45)
         self.image = image
         self.rect = self.image.get_rect()
         self.x = x * DRAW_SCALE
@@ -34,6 +35,15 @@ class Ship(pygame.sprite.Sprite):
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
+
+    def _rot_center(self, image, angle):
+        """rotate an image while keeping its center and size"""
+        orig_rect = image.get_rect()
+        rot_image = pygame.transform.rotate(image, angle)
+        rot_rect = orig_rect.copy()
+        rot_rect.center = rot_image.get_rect().center
+        rot_image = rot_image.subsurface(rot_rect).copy()
+        return rot_image
 
 def init(obstacles, goal):
     """draw initial scene and obstacles"""
