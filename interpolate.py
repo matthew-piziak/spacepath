@@ -8,18 +8,25 @@ INTERPOLATION_FACTOR = 16
 
 def interpolate_path(path):
     """generate a higher resolution path using cubic spline interpolation"""
-    node_positions = [(n.x, n.y, n.angle) for n in path]
+    node_positions = [(n[0].x, n[0].y, n[0].angle) for n in path]
     if not INTERPOLATE:
         return node_positions
     t = numpy.arange(0, len(node_positions))
+    print([p[0] for p in node_positions])
     f_x = interpolate.interp1d(t, [p[0] for p in node_positions], 'cubic')
     f_y = interpolate.interp1d(t, [p[1] for p in node_positions], 'cubic')
     t_new = numpy.arange(0, len(node_positions) - 2, 1.0 / INTERPOLATION_FACTOR)
     interpolated_x = f_x(t_new)
     interpolated_y = f_y(t_new)
     interpolated_angle = _angles([p[2] for p in node_positions])
-    return zip(interpolated_x, interpolated_y, interpolated_angle)
-
+    actionless_path = zip(interpolated_x, interpolated_y, interpolated_angle)
+    actions = []
+    for n in path:
+        for _ in range(INTERPOLATION_FACTOR):
+            actions.append(n[1])
+    interpolated_path = zip(actionless_path, actions)
+    return interpolated_path
+        
 def _angles(angles):
     """custom linear modulus interpolation for angles"""
     interpolated_angles = []

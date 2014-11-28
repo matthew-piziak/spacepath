@@ -37,7 +37,10 @@ def adjacent(node):
         for vel in adj_velocities(node):
             for angle in adj_angles(node):
                 adj_node = Node(pos[0], pos[1], vel[0], vel[1], angle)
-                adj_nodes.append(adj_node)
+                if not vel == (node.v_x, node.v_y):
+                    adj_nodes.append((adj_node, "cruise"))
+                else:
+                    adj_nodes.append((adj_node, "burn"))
     return adj_nodes
 
 def heuristic(node, goal, obstacles, bounds):

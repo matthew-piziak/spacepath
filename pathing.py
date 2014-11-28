@@ -18,11 +18,11 @@ def a_star(start, goal, adjacent, heuristic, success):
         if success(node, goal):
             print("heap: " + str(len(open_heap)))
             return _reconstruct_path(came_from, node)
-        for adj in adjacent(node):
+        for adj, action in adjacent(node):
             if adj in seen:
                 continue
             seen.add(adj)
-            came_from[adj] = node
+            came_from[adj] = (node, action)
             # adjacency is based on a constant time step
             g_score[adj] = g_score[node] + 1
             h_score = heuristic(adj, goal)
@@ -32,7 +32,7 @@ def a_star(start, goal, adjacent, heuristic, success):
 def _reconstruct_path(came_from, node):
     """trace back the path built by A*"""
     if node in came_from:
-        path = _reconstruct_path(came_from, came_from[node])
-        return path + [node]
+        path = _reconstruct_path(came_from, came_from[node][0])
+        return path + [(node, came_from[node][1])]
     else:
         return [node]
