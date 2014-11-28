@@ -1,9 +1,9 @@
 """Game rendering functions"""
 
 import pygame
-import numpy as np
-from scipy import interpolate
+import numpy
 import math
+from scipy import interpolate
 
 # drawing constants
 NODE_RADIUS = 3
@@ -82,10 +82,10 @@ def interpolate_path(path):
     node_positions = [(n.x, n.y, n.angle) for n in path]
     if not INTERPOLATE:
         return node_positions
-    t = np.arange(0, len(node_positions))
+    t = numpy.arange(0, len(node_positions))
     f_x = interpolate.interp1d(t, [p[0] for p in node_positions], 'cubic')
     f_y = interpolate.interp1d(t, [p[1] for p in node_positions], 'cubic')
-    t_new = np.arange(0, len(node_positions) - 2, 1.0 / INTERPOLATION_FACTOR)
+    t_new = numpy.arange(0, len(node_positions) - 2, 1.0 / INTERPOLATION_FACTOR)
     interpolated_x = f_x(t_new)
     interpolated_y = f_y(t_new)
     interpolated_angle = interpolate_angles([p[2] for p in node_positions])

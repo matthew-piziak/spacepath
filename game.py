@@ -7,9 +7,6 @@ import pathing
 import time
 import subprocess
 import os
-import math
-from scipy import interpolate
-import numpy as np
 import draw
 
 # obstacle constants
