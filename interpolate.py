@@ -6,7 +6,7 @@ from scipy import interpolate
 INTERPOLATE = True
 INTERPOLATION_FACTOR = 16
 
-def path(path):
+def interpolate_path(path):
     """generate a higher resolution path using cubic spline interpolation"""
     node_positions = [(n.x, n.y, n.angle) for n in path]
     if not INTERPOLATE:

@@ -27,7 +27,7 @@ def init(obstacles, goal):
 
 def animate_path(window, obstacles, goal, path):
     """animate path"""
-    interpolated_path = interpolate.path(path)
+    interpolated_path = interpolate.interpolate_path(path)
     for node in interpolated_path:
         _scene(window, obstacles)
         _goal(window, goal)
