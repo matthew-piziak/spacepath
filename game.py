@@ -34,7 +34,8 @@ GOAL = newt.Node(160, 160, 0, 0, 0)
 def draw_obstacle(window, obstacle):
     """draw obstacle"""
     location = (obstacle.x * DRAW_SCALE, obstacle.y * DRAW_SCALE)
-    radius = (obstacle.radius * DRAW_SCALE) - int(NODE_RADIUS * DRAW_SCALE * 1.4)
+    node_overlap = int(NODE_RADIUS * DRAW_SCALE * 1.3)
+    radius = (obstacle.radius * DRAW_SCALE) - node_overlap
     pygame.draw.circle(window, OBSTACLE_COLOR, location, radius)
 
 def generate_random_obstacle():
@@ -63,9 +64,12 @@ def draw_node(window, x, y, angle):
     node_draw_radius = NODE_RADIUS * DRAW_SCALE
     pygame.draw.circle(window, NODE_COLOR, (node_x, node_y), node_draw_radius)
     node_angle = (math.pi / 4) * float(angle)
-    angle_x = (math.cos(node_angle) * DRAW_SCALE * ANGLE_LENGTH) + node_x
-    angle_y = (math.sin(node_angle) * DRAW_SCALE * ANGLE_LENGTH) + node_y
-    pygame.draw.line(window, NODE_COLOR, (node_x, node_y), (angle_x, angle_y), 2)
+    origin = (node_x, node_y)
+    angle_length_multiplier = DRAW_SCALE * ANGLE_LENGTH
+    angle_x = (math.cos(node_angle) * angle_length_multiplier) + node_x
+    angle_y = (math.sin(node_angle) * angle_length_multiplier) + node_y
+    angle_tip = (angle_x, angle_y)
+    pygame.draw.line(window, NODE_COLOR, origin, angle_tip, 2)
 
 def draw_scene(window, obstacles):
     """draw scene"""
@@ -89,23 +93,26 @@ def interpolate_angles(angles):
     interpolated_angles = []
     fraction = 1.0 / INTERPOLATION_FACTOR
     for i in range(len(angles) - 1):
-        if abs(angles[i + 1] - angles[i]) <= 4:
-            for f in range(INTERPOLATION_FACTOR):
-                interpolated_angle = ((INTERPOLATION_FACTOR - f) * fraction * float(angles[i])) + (f * fraction * float(angles[i + 1]))
+        start_angle = float(angles[i])
+        end_angle = float(angles[i + 1])
+        if abs(end_angle - start_angle) <= 4:
+            for j in range(INTERPOLATION_FACTOR):
+                start_factor = (INTERPOLATION_FACTOR - j) * start_angle
+                end_factor = j * end_angle
+                interpolated_angle = (start_factor + end_factor) * fraction
                 interpolated_angles.append(interpolated_angle)
         else:
-            for f in range(INTERPOLATION_FACTOR):
-                start_angle = angles[i]
-                end_angle = angles[i + 1]
+            for j in range(INTERPOLATION_FACTOR):
                 if start_angle < 4:
                     start_angle += 8
                 if end_angle < 4:
                     end_angle += 8
-                interpolated_angle = ((INTERPOLATION_FACTOR - f) * fraction * float(start_angle)) + (f * fraction * float(end_angle))
-                interpolated_angle = interpolated_angle % 8
+                start_factor = (INTERPOLATION_FACTOR - j) * start_angle
+                end_factor = j * end_angle
+                interpolated_angle = start_factor + end_factor
+                interpolated_angle = (interpolated_angle * fraction) % 8
                 interpolated_angles.append(interpolated_angle)
     return interpolated_angles
-
 
 def interpolate_path(path):
     """generate a higher resolution path using cubic spline interpolation"""
