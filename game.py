@@ -1,33 +1,18 @@
 """Game runner"""
 
-import newt
-import pygame
-import random
-import pathing
-import time
 import subprocess
 import os
-import draw
 
-# obstacle constants
-NUM_OBSTACLES = 12
+import pygame
+
+import newt
+import pathing
+import draw
+import obstacle
 
 # nodes
 START = newt.Node(0, 0, 0, 0, 1)
 GOAL = newt.Node(160, 160, 0, 0, 0)
-
-def generate_random_obstacle():
-    """generate random obstacle"""
-    maximum_obstacle_radius = 18
-    minimum_obstacle_radius = 12
-    max_x_position = GOAL.x - maximum_obstacle_radius
-    max_y_position = GOAL.y - maximum_obstacle_radius
-    min_x_position = START.x + maximum_obstacle_radius
-    min_y_position = START.y + maximum_obstacle_radius
-    radius = random.randint(minimum_obstacle_radius, maximum_obstacle_radius)
-    x = random.randint(min_x_position, max_x_position)
-    y = random.randint(min_y_position, max_y_position)
-    return newt.Circle(x, y, radius)
 
 def get_path(obstacles, bounds):
     """return nodes in path from A*"""
@@ -53,25 +38,12 @@ def make_gif():
 
 def main():
     """generate path and render"""
-    obstacles = []
-    for _ in range(random.randint(0, NUM_OBSTACLES)):
-        obstacle = generate_random_obstacle()
-        obstacles.append(obstacle)
+    obstacles = obstacle.get_obstacles(START.x, START.y, GOAL.x, GOAL.y)
     bounds = (GOAL.x + 10, GOAL.y + 10)
-    window_dimensions = ((GOAL.x + 10) * 4, (GOAL.y + 10) * 4)
-    window = pygame.display.set_mode(window_dimensions)
-    draw.draw_scene(window, obstacles)
-    draw.draw_goal(window, GOAL)
+    window = draw.init(obstacles, GOAL)
     pygame.display.flip()
     path = get_path(obstacles, bounds)
-    interpolated_path = draw.interpolate_path(path)
-    clear_images()
-    for node in interpolated_path:
-        draw.draw_scene(window, obstacles)
-        draw.draw_goal(window, GOAL)
-        draw.draw_node(window, node[0], node[1], node[2])
-        pygame.display.flip()
-        time.sleep(0.005)
+    draw.path(window, obstacles, GOAL, path)
 
 if __name__ == "__main__":
     while True:

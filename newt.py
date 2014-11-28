@@ -1,10 +1,10 @@
 """Newtonian physics specificiations"""
 
 import math
+import obstacle
 from collections import namedtuple
 
 Node = namedtuple('Node', ['x', 'y', 'v_x', 'v_y', 'angle'])
-Circle = namedtuple('Circle', ['x', 'y', 'radius'])
 
 def adj_position(node):
     """determines position for the next time step"""
@@ -40,18 +40,6 @@ def adjacent(node):
                 adj_nodes.append(adj_node)
     return adj_nodes
 
-def circle_contains_node(circle, node):
-    """returns whether the node is contained in the circle"""
-    dx = abs(node.x - circle.x)
-    dy = abs(node.y - circle.y)
-    if dx > circle.radius:
-        return False
-    if dy > circle.radius:
-        return False
-    if dx + dy <= circle.radius:
-        return True
-    return (dx ** 2) + (dy ** 2) <= circle.radius ** 2
-
 def heuristic(node, goal, obstacles, bounds):
     """newtonian physics heuristic for A*"""
     acceleration = 2 # hardcoded for sine and cosine optimization
@@ -82,11 +70,7 @@ def heuristic(node, goal, obstacles, bounds):
                 return True
     def in_obstacle():
         """determines if the node is inside an obstacle"""
-        def obstacle_contains_node(obstacle):
-            """determines collision for a single obstacle"""
-            circle = Circle(obstacle.x, obstacle.y, obstacle.radius)
-            return circle_contains_node(circle, node)
-        return any([obstacle_contains_node(o) for o in obstacles])
+        return any([obstacle.contains_node(node.x, node.y, o) for o in obstacles])
     h_max = 1000000
     if outside_arena() or leaving_arena() or in_obstacle():
         return h_max
@@ -101,7 +85,7 @@ def heuristic(node, goal, obstacles, bounds):
 def success(node, goal):
     """success function for A*"""
     success_radius = 6
-    success_region = Circle(goal.x, goal.y, success_radius)
-    location = circle_contains_node(success_region, node)
+    success_region = obstacle.Obstacle(goal.x, goal.y, success_radius)
+    location = obstacle.contains_node(node.x, node.y, success_region)
     speed = abs(node.v_x - goal.v_x) + abs(node.v_y - goal.v_y) == 0
     return location and speed
