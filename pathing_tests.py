@@ -5,8 +5,8 @@ import unittest
 import math
 
 class TestPathing(unittest.TestCase):
-    # pylint: disable=R0904
     """Test suite for pathing module"""
+    # pylint: disable=R0904
 
     def setUp(self):
         self.start = (0, 0)
@@ -14,10 +14,10 @@ class TestPathing(unittest.TestCase):
         def manhattan(node):
             """returns a list of adjacent nodes in mahattan distance"""
             adjacency_list = []
-            adjacency_list.append((node[0] + 1, node[1]))
-            adjacency_list.append((node[0] - 1, node[1]))
-            adjacency_list.append((node[0], node[1] + 1))
-            adjacency_list.append((node[0], node[1] - 1))
+            adjacency_list.append(((node[0] + 1, node[1]), None))
+            adjacency_list.append(((node[0] - 1, node[1]), None))
+            adjacency_list.append(((node[0], node[1] + 1), None))
+            adjacency_list.append(((node[0], node[1] - 1), None))
             return adjacency_list
         self.adjacent = manhattan
         def euclidean_distance(node, goal):
@@ -34,7 +34,7 @@ class TestPathing(unittest.TestCase):
                               self.heuristic,
                               self.success)
         self.assertEqual(len(path), 9)
-        self.assertIn((2, 2), path)
+        self.assertIn(((2, 2), None), path)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,34 +1,48 @@
 """Draw interpolation"""
 
-import numpy
+from collections import namedtuple
 from scipy import interpolate
+import numpy
 
 INTERPOLATE = True
-INTERPOLATION_FACTOR = 16
+INTERPOLATION_FACTOR = 12
+
+InterpolationNode = namedtuple('InterpolationNode', ['x', 'y', 'angle'])
 
 def interpolate_path(path):
-    """generate a higher resolution path using cubic spline interpolation"""
-    node_positions = [(n[0].x, n[0].y, n[0].angle) for n in path]
+    """Generate a higher resolution path using cubic spline interpolation."""
+    def get_interpolation_node(node):
+        """Simplify the node so that interpolation is easier."""
+        return InterpolationNode(node[0].x, node[0].y, node[0].angle)
+    interpolaton_nodes = [get_interpolation_node(n) for n in path]
     if not INTERPOLATE:
-        return node_positions
-    t = numpy.arange(0, len(node_positions))
-    print([p[0] for p in node_positions])
-    f_x = interpolate.interp1d(t, [p[0] for p in node_positions], 'cubic')
-    f_y = interpolate.interp1d(t, [p[1] for p in node_positions], 'cubic')
-    t_new = numpy.arange(0, len(node_positions) - 2, 1.0 / INTERPOLATION_FACTOR)
+        return interpolaton_nodes
+    t = numpy.arange(0, len(interpolaton_nodes))
+    f_x = interpolate.interp1d(t, [p.x for p in interpolaton_nodes], 'cubic')
+    f_y = interpolate.interp1d(t, [p.y for p in interpolaton_nodes], 'cubic')
+    t_new = numpy.arange(0,
+                         len(interpolaton_nodes) - 2,
+                         1.0 / INTERPOLATION_FACTOR)
     interpolated_x = f_x(t_new)
     interpolated_y = f_y(t_new)
-    interpolated_angle = _angles([p[2] for p in node_positions])
+    interpolated_angle = _angles([p.angle for p in interpolaton_nodes])
     actionless_path = zip(interpolated_x, interpolated_y, interpolated_angle)
-    actions = []
-    for n in path:
-        for _ in range(INTERPOLATION_FACTOR):
-            actions.append(n[1])
-    interpolated_path = zip(actionless_path, actions)
+    def get_actions(path):
+        """Get actions for each node in the interpolated path.
+
+        Each interpolated node is assigned the same action as the
+        previous real node.
+
+        """
+        actions = []
+        for node in path:
+            actions += [node[1] for _ in range(INTERPOLATION_FACTOR)]
+        return actions
+    interpolated_path = zip(actionless_path, get_actions(path))
     return interpolated_path
-        
+
 def _angles(angles):
-    """custom linear modulus interpolation for angles"""
+    """Perform linear modulus interpolation for angles."""
     interpolated_angles = []
     fraction = 1.0 / INTERPOLATION_FACTOR
     for i in range(len(angles) - 1):

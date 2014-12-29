@@ -7,7 +7,7 @@ import time
 
 # drawing constants
 NODE_RADIUS = 3
-DRAW_SCALE = 4
+DRAW_SCALE = 6
 NODE_COLOR = (255, 255, 255)
 OBSTACLE_COLOR = (100, 100, 100)
 GOAL_COLOR = (100, 100, 255)
@@ -19,31 +19,33 @@ FRAME_STEP = 0.01
 
 class Ship(pygame.sprite.Sprite):
     """Represents the ship"""
+    # pylint: disable=R0903
+    # This is a necessary extension of the sprite class, so the 'Too
+    # few public methods' pylint warning can be ignored.
 
     def __init__(self, x, y, angle, action):
         scale = NODE_RADIUS * DRAW_SCALE * 2
-        image = pygame.image.load("ship.png")
-        if action == "cruise":
-            image = pygame.image.load("ship_burn.png")
-        image = pygame.transform.smoothscale(image, (scale, scale))
-        image = self._rot_center(image, -90)
-        image = self._rot_center(image, -1 * angle * 45)
-        self.image = image
+        images = {"cruise": "ship.png", "burn": "ship_burn.png"}
+        self.image = pygame.image.load(images[action])
+        self.image = pygame.transform.smoothscale(self.image,
+                                                  (scale, scale))
+        def rot_center(angle):
+            """rotate an image while keeping its center and size"""
+            orig_rect = self.image.get_rect()
+            rot_image = pygame.transform.rotate(self.image, angle)
+            rot_rect = orig_rect.copy()
+            rot_rect.center = rot_image.get_rect().center
+            rot_image = rot_image.subsurface(rot_rect).copy()
+            self.image = rot_image
+        rot_center(-90)
+        rot_center(-1 * angle * 45)
         self.rect = self.image.get_rect()
         self.x = x * DRAW_SCALE
         self.y = y * DRAW_SCALE
 
     def draw(self, surface):
+        """Draw ship sprite to surface."""
         surface.blit(self.image, (self.x, self.y))
-
-    def _rot_center(self, image, angle):
-        """rotate an image while keeping its center and size"""
-        orig_rect = image.get_rect()
-        rot_image = pygame.transform.rotate(image, angle)
-        rot_rect = orig_rect.copy()
-        rot_rect.center = rot_image.get_rect().center
-        rot_image = rot_image.subsurface(rot_rect).copy()
-        return rot_image
 
 def init(obstacles, goal):
     """draw initial scene and obstacles"""
@@ -63,12 +65,12 @@ def animate_path(window, obstacles, goal, path):
         ship = Ship(node[0], node[1], node[2], action)
         ship.draw(window)
         pygame.display.flip()
-        time.sleep(FRAME_STEP)
+        time.sleep(0.01)
 
 def _obstacle(window, obstacle):
     """draw obstacle"""
     location = (obstacle.x * DRAW_SCALE, obstacle.y * DRAW_SCALE)
-    node_overlap = int(NODE_RADIUS * DRAW_SCALE * 1.3)
+    node_overlap = int(NODE_RADIUS * DRAW_SCALE * 2)
     radius = (obstacle.radius * DRAW_SCALE) - node_overlap
     pygame.draw.circle(window, OBSTACLE_COLOR, location, radius)
 
@@ -100,4 +102,3 @@ def _scene(window, obstacles):
     window.fill(BACKGROUND_COLOR)
     for obstacle in obstacles:
         _obstacle(window, obstacle)
-

@@ -1,4 +1,4 @@
-"""generalized pathing functions"""
+"""Generalized pathing functions."""
 
 import heapq
 

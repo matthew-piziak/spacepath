@@ -7,9 +7,9 @@ Obstacle = collections.namedtuple('Obstacle', ['x', 'y', 'radius'])
 
 def get_obstacles(min_x, min_y, max_x, max_y):
     """return an allotment of obstacles"""
-    num_obstacles = 12
+    num_obstacles = 6
     generate = lambda: _generate_random_obstacle(min_x, min_y, max_x, max_y)
-    return [generate() for _ in range(0, random.randint(0, num_obstacles))]
+    return [generate() for _ in range(0, random.randint(1, num_obstacles))]
 
 def contains_node(x, y, obstacle):
     """returns whether the node is contained in the obstacle"""
