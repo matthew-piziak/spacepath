@@ -67,3 +67,9 @@ sacrifices some optimality in favor of letting the pathfinder search
 deeper along the best-guess path. Spacepath uses a bounded relaxation
 factor of 2%, which means that generated paths are only guaranteed to
 be 98% optimal.
+
+## Artistic Credit
+
+Thank you zxBranden from OpenGameArt for the spaceship sprite.
+
+[Original source](http://opengameart.org/users/zxbranden)
