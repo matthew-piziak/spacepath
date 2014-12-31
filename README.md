@@ -68,7 +68,23 @@ deeper along the best-guess path. Spacepath uses a bounded relaxation
 factor of 2%, which means that generated paths are only guaranteed to
 be 98% optimal.
 
-## Artistic Credit
+## Thanks
+
+### Physics
+
+Thanks to Physics StackExchange users [Kurtovic](http://physics.stackexchange.com/users/44104/kurtovic) and [nivag](http://physics.stackexchange.com/users/44576/nivag) for helping
+me determine the kinematic equations necessary to solve for the heuristic.
+
+[Original Question](http://physics.stackexchange.com/questions/112687/how-long-does-it-take-to-optimally-change-position-and-velocity)
+
+### Math
+
+Thanks to Mathematics StackExchange users [ah-huh-moment](http://math.stackexchange.com/users/101504/ah-huh-moment) and
+[hypergeometric](http://math.stackexchange.com/users/168053/hypergeometric) for helping me solve the resulting algebraic system.
+
+[Original Question](http://math.stackexchange.com/questions/1021921/solve-system-of-kinematics-equation)
+
+### Art
 
 Thank you zxBranden from OpenGameArt for the spaceship sprite.
 
