@@ -12,8 +12,8 @@ bottom right, and a random number of gray obstacles.
 
 The spaceship paths to the goal region using a time-optimal path, with
 two constraints:
-    - the ship must come to a complete stop in the goal region
-    - the ship must avoid any obstacles en route
+- the ship must come to a complete stop in the goal region
+- the ship must avoid any obstacles en route
 
 Note that the ship obeys conservation of momentum and takes this fact
 into account while calculating the optimal path.
@@ -30,15 +30,15 @@ breadth-first search.
 ### The Graph Model
 
 Each search node is five dimensional:
-    - location X
-    - location Y
-    - velocity X
-    - velocity Y
-    - angle
+- location X
+- location Y
+- velocity X
+- velocity Y
+- angle
 
 At each search step, the velocity is applied to the location. The ship also makes two choices:
-    - burn or cruise
-	- fly straight or turn left or turn right
+- burn or cruise
+- fly straight or turn left or turn right
 
 This corresponds to a branching factor of 6. Angular resolution is not
 currently conserved, but this is a planned future improvement.
@@ -53,8 +53,8 @@ future improvement.
 #### Turning bias
 
 When two paths are equivalent, the ship breaks ties deterministically:
-    - cruising > burning
-    - straight > clockwise > counterclockwise
+- cruising > burning
+- straight > clockwise > counterclockwise
 
 #### Fast sine and cosine
 
