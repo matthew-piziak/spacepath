@@ -8,6 +8,8 @@ To run the demo, invoke `python demo.py`
 The demo spawns a spaceship in the upper left, a goal region in the
 bottom right, and a random number of gray obstacles.
 
+31 prerendered demos can be seen [here](http://imgur.com/a/K8XfM).
+
 The spaceship paths to the goal region using a time-optimal path, with
 two constraints:
     - the ship must come to a complete stop in the goal region
