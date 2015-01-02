@@ -1,6 +1,6 @@
 # Spacepath
 
-Spacepath is a demonstration of A* pathfinding applied to Newtonian
+Spacepath is a demonstration of A\* pathfinding applied to Newtonian
 physics.
 
 To run the demo, invoke `python demo.py`
@@ -18,9 +18,9 @@ two constraints:
 Note that the ship obeys conservation of momentum and takes this fact
 into account while calculating the optimal path.
 
-The pathfinding algorithm used is standard A*. All domain information
+The pathfinding algorithm used is standard A\*. All domain information
 about Newtonian physics is entirely contained in the `newt` heuristic
-function. This demonstrates that A* can efficiently perform Newtonian
+function. This demonstrates that A\* can efficiently perform Newtonian
 pathfinding. For a representative simulation the `newt` heuristic
 searches only 0.1% of the space that would be explored by
 breadth-first search.
