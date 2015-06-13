@@ -3,6 +3,7 @@
 import pathing
 import unittest
 import math
+import time
 
 class TestPathing(unittest.TestCase):
     """Test suite for pathing module"""
@@ -28,13 +29,17 @@ class TestPathing(unittest.TestCase):
 
     def test_a_star(self):
         """test that path is optimal and obeys heuristic"""
+        start = time.time()
         path = pathing.a_star(self.start,
                               self.goal,
                               self.adjacent,
                               self.heuristic,
                               self.success)
+        stop = time.time()
+        elapsed_ms = (stop - start) * 1000
         self.assertEqual(len(path), 9)
         self.assertIn(((2, 2), None), path)
+        print("Path found. Time elapsed: %f milliseconds.", elapsed_ms)
 
 if __name__ == '__main__':
     unittest.main()
