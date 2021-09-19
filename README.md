@@ -3,12 +3,12 @@
 Spacepath is a demonstration of A\* pathfinding applied to Newtonian
 physics.
 
+![demo](https://i.imgur.com/8ClC7Tr.gif) ![demo2](https://i.imgur.com/DCVFNwP.gif)
+
 To run the demo, invoke `python demo.py`
 
 The demo spawns a spaceship in the upper left, a goal region in the
 bottom right, and a random number of gray obstacles.
-
-31 prerendered demos can be seen [here](http://imgur.com/a/K8XfM).
 
 The spaceship paths to the goal region using a time-optimal path, with
 two constraints:
@@ -24,6 +24,8 @@ function. This demonstrates that A\* can efficiently perform Newtonian
 pathfinding. For a representative simulation the `newt` heuristic
 searches only 0.1% of the space that would be explored by
 breadth-first search.
+
+31 prerendered demos can be seen [here](http://imgur.com/a/K8XfM).
 
 ## Implementation Details
 
